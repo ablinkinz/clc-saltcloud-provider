@@ -175,6 +175,17 @@ def list_nodes_full(call=None, for_output=True):
     servers = json.loads(servers_raw)
     return(servers)
 
+def list_nodes(call=None):
+    #nodes_full = list_nodes_full()
+    #return nodes_full     
+    if call == 'action':
+        raise SaltCloudSystemExit(
+            'The list_nodes_full function must be called with -f or --function.'
+        )
+    creds = get_creds()
+    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
+    servers_raw = clc.v1.Server.GetServers(location=None)
+    return servers_raw
 def get_queue_data(call=None, for_output=True):
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"],creds["token_pass"])
@@ -297,7 +308,10 @@ def get_build_status(req_id,nodename):
         if (queue["PercentComplete"] == 100):
             
             server_name = queue["Servers"][0]
-            return 1            
+            server_details = clc.v1.Server.GetServerDetails(alias=None, servers=[server_name,])
+            for server in server_details:
+                server_ip = server["IPAddress"]
+            return server_ip            
         else:
             counter = counter + 1
             log.info("Creating Cloud VM " + nodename + " Time out in " + str(10 - counter) + " minutes")
@@ -344,7 +358,8 @@ def create(vm_):
         password = ''
     clc_return = clc.v1.Server.Create(alias=None,location=(location),name=(name),template=(template),cpu=(cpu),ram=(ram),backup_level=(backup_level),group=(group), network=(network),description=(description),password=(password))
     req_id = clc_return["RequestID"]
-    get_build_status(req_id,name)
+    server_ip = get_build_status(req_id,name)
+    vm_['ssh_host'] = server_ip
     __utils__['cloud.fire_event'](
         'event',
         'waiting for ssh',
@@ -361,4 +376,12 @@ def create(vm_):
     return({"Status":"CLC Returned: Build Completed"})
 
 def destroy(name, call=None):
-    print("destroying ")
+    __utils__['cloud.fire_event'](
+        'event',
+        'destroying instance',
+        'salt/cloud/{0}/destroying'.format(name),
+        args={'name': name},
+        sock_dir=__opts__['sock_dir'],
+        transport=__opts__['transport']
+    )
+    return {"status":"server be gone"}    
