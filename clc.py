@@ -175,6 +175,84 @@ def list_nodes_full(call=None, for_output=True):
     servers = json.loads(servers_raw)
     return(servers)
 
+def get_queue_data(call=None, for_output=True):
+    creds = get_creds()
+    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
+    cl_queue = clc.v1.Queue.List()
+    return(cl_queue)
+
+
+def get_monthly_estimate(call=None, for_output=True):
+    '''
+    Return a list of the VMs that are on the provider
+    '''
+    creds = get_creds()
+    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
+    if call == 'action':
+        raise SaltCloudSystemExit(
+            'The list_nodes_full function must be called with -f or --function.'
+        )
+    try:
+        billing_raw = clc.v1.Billing.GetAccountSummary(alias='SBA')
+        billing_raw = json.dumps(billing_raw)
+        billing = json.loads(billing_raw)
+        billing = round(billing["MonthlyEstimate"],2)
+        return ({"Monthly Estimate":billing})
+    except:
+        return(0)
+
+def get_month_to_date(call=None, for_output=True):
+    '''
+    Return a list of the VMs that are on the provider
+    '''
+    creds = get_creds()
+    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
+    if call == 'action':
+        raise SaltCloudSystemExit(
+            'The list_nodes_full function must be called with -f or --function.'
+        )
+    try:
+        billing_raw = clc.v1.Billing.GetAccountSummary(alias='SBA')
+        billing_raw = json.dumps(billing_raw)
+        billing = json.loads(billing_raw)
+        billing = round(billing["MonthToDateTotal"],2)
+        return ({"Month To Date":billing})
+    except:
+        return(0)
+
+def get_server_alerts(call=None, for_output=True, **kwargs):
+    for key,value in kwargs.iteritems():
+        servername = value["servername"]
+    creds = get_creds()
+    clc.v2.SetCredentials(creds["user"],creds["password"])
+    alerts = clc.v2.Server(servername).Alerts()
+    return alerts
+
+
+def get_group_estimate(call=None, for_output=True, **kwargs):
+    '''
+    Return a list of the VMs that are on the provider
+    usage: "salt-cloud -f get_group_estimate clc group=Dev location=VA1"
+    '''
+    for key,value in kwargs.iteritems():
+        group = value["group"]
+        location = value["location"]
+    creds = get_creds()
+    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
+    if call == 'action':
+        raise SaltCloudSystemExit(
+            'The list_nodes_full function must be called with -f or --function.'
+        )
+    try:
+        billing_raw = clc.v1.Billing.GetGroupEstimate(group=group,alias='SBA',location=location)
+        billing_raw = json.dumps(billing_raw)
+        billing = json.loads(billing_raw)
+        estimate = round(billing["MonthlyEstimate"],2)
+        month_to_date = round(billing["MonthToDate"],2)
+        return ({"Monthly Estimate":estimate,"Month to Date":month_to_date})
+    except:
+        return(0)
+
 def avail_images(call=None):
     all_servers = list_nodes_full()
     templates = {}
@@ -209,7 +287,7 @@ def get_configured_provider():
     return config.is_provider_configured(
         __opts__,
         __active_provider_name__ or __virtualname__,
-        ('token',)
+        ('token','token_pass','user','password',)
     )
 def get_build_status(req_id,nodename):
     counter = 0
@@ -219,24 +297,11 @@ def get_build_status(req_id,nodename):
         if (queue["PercentComplete"] == 100):
             
             server_name = queue["Servers"][0]
-            return(server_name)            
+            return 1            
         else:
             counter = counter + 1
             log.info("Creating Cloud VM " + nodename + " Time out in " + str(10 - counter) + " minutes")
             time.sleep(60)
-def get_ip(nodename=None,call=None):
-    if nodename==None:
-        nodename = 'VA1SBAFOO1308'
-    print("Looking up IP for ",nodename)
-    creds = get_creds()
-    clc.v1.SetCredentials(creds["token"],creds["token_pass"])
-    server_details = clc.v1.Server.GetServerDetails(alias=None,servers=[(nodename),])
-    #server_details = json.dumps(server_details)
-    #server_details = json.loads(server_details)
-    for server in server_details:
-        ipaddress = server["IPAddress"]
-    return(ipaddress)
-
 def create(vm_):
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"],creds["token_pass"])
@@ -279,8 +344,7 @@ def create(vm_):
         password = ''
     clc_return = clc.v1.Server.Create(alias=None,location=(location),name=(name),template=(template),cpu=(cpu),ram=(ram),backup_level=(backup_level),group=(group), network=(network),description=(description),password=(password))
     req_id = clc_return["RequestID"]
-    clc_servername = get_build_status(req_id,name)
-    vm_['ssh_host'] = get_ip(clc_servername)
+    get_build_status(req_id,name)
     __utils__['cloud.fire_event'](
         'event',
         'waiting for ssh',
@@ -289,11 +353,12 @@ def create(vm_):
         args={'ip_address': vm_['ssh_host']},
         transport=__opts__['transport']
     )
+
     # Bootstrap!
     ret = __utils__['cloud.bootstrap'](vm_, __opts__)
 
-    #ret.update(data)
-    return({"Status":"Build Completed","Server":(clc_servername),"IP":get_ip(clc_servername)})
+    ret.update(data)
+    return({"Status":"CLC Returned: Build Completed"})
 
 def destroy(name, call=None):
     print("destroying ")
