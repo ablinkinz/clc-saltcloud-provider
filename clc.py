@@ -3,7 +3,7 @@
 CenturyLink Cloud Module
 ===================
 
-.. versionadded:: 2017.7.14
+.. versionadded:: 0yxgen
 
 The CLC cloud module allows you to manage CLC Via the CLC SDK.
 
@@ -14,6 +14,7 @@ Dependencies
 ============
 
 - clc-sdk Python Module
+- flask
 
 CLC SDK
 -------
@@ -27,10 +28,16 @@ clc-sdk can be installed via pip:
 .. note::
   For sdk reference see: https://github.com/CenturyLinkCloud/clc-python-sdk
 
+Flask
+-------
+flask can be installed via pip:
+.. code-block:: bash
+    pip install flask
+
 Configuration
 =============
 
-To use this module, set up the clc-sdk, username,password,key in the
+To use this module: set up the clc-sdk, user, password, key in the
 cloud configuration at
 ``/etc/salt/cloud.providers`` or ``/etc/salt/cloud.providers.d/clc.conf``:
 
@@ -68,7 +75,6 @@ import json
 import salt.utils
 import salt.utils.cloud
 import salt.utils.xmlutil
-#import pip
 import importlib
 from salt.exceptions import SaltCloudSystemExit
 from flask import Flask, request
@@ -77,6 +83,7 @@ import salt.config as config
 import requests
 # Attempt to import clc-sdk lib
 try:
+        #when running this in linode's Ubuntu 16.x version the following line is required to get the clc sdk libraries to load
         importlib.import_module('clc')
         import clc
 	HAS_CLC = True
@@ -99,7 +106,6 @@ except ImportError:
     except ImportError:
         HAS_SIX = False
 
-IP_RE = r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
 
 # Get logging started
 log = logging.getLogger(__name__)
@@ -112,11 +118,8 @@ def __virtual__():
     '''
     Check for CLC configuration and if required libs are available.
     '''
-    if get_configured_provider() is False:
+    if get_configured_provider() is False or get_dependencies() is False:
        return False
-
-    if get_dependencies() is False:
-        return False
 
     return __virtualname__
 
@@ -158,7 +161,7 @@ def get_creds():
     token_pass = config.get_cloud_config_value(
     'token_pass', get_configured_provider(), __opts__, search_global=False
     )
-    creds = {"user":user,"password":password,"token":token,"token_pass":token_pass}
+    creds = {'user':user, 'password':password, 'token':token, 'token_pass':token_pass}
     return creds
 def list_nodes_full(call=None, for_output=True):
     '''
@@ -365,4 +368,4 @@ def create(vm_):
     return(return_message)
 
 def destroy(name, call=None):
-    print("destroying ")
+    return("destroying")
