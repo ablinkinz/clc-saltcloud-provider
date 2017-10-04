@@ -127,13 +127,10 @@ def __virtual__():
 
 
 def get_configured_provider():
-    '''
-    Return the first configured instance.
-    '''
     return config.is_provider_configured(
         __opts__,
         __active_provider_name__ or __virtualname__,
-        ('token', 'token_pass', 'user', 'password',)
+        ('token', 'token_pass', 'user', 'password', )
     )
 
 
@@ -299,14 +296,6 @@ def __virtual__():
         return False
 
     return __virtualname__
-
-
-def get_configured_provider():
-    return config.is_provider_configured(
-        __opts__,
-        __active_provider_name__ or __virtualname__,
-        ('token', 'token_pass', 'user', 'password', )
-    )
 
 
 def get_build_status(req_id,nodename):
