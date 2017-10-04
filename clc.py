@@ -205,9 +205,9 @@ def get_monthly_estimate(call=None, for_output=True):
         billing_raw = clc.v1.Billing.GetAccountSummary(alias=creds["accountalias"])
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
-        billing = round(billing["MonthlyEstimate"],2)
-        return ({"Monthly Estimate":billing})
-    except (RuntimeError):
+        billing = round(billing["MonthlyEstimate"], 2)
+        return {"Monthly Estimate":billing}
+    except RuntimeError:
         return {"Monthly Estimate":0}
 
 
@@ -226,13 +226,13 @@ def get_month_to_date(call=None, for_output=True):
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
         billing = round(billing["MonthToDateTotal"], 2)
-        return ({"Month To Date":billing})
-    except (RuntimeError):
+        return {"Month To Date":billing}
+    except RuntimeError:
         return 0
 
 
 def get_server_alerts(call=None, for_output=True, **kwargs):
-    for key,value in kwargs.iteritems():
+    for key, value in kwargs.iteritems():
         servername = value["servername"]
     creds = get_creds()
     clc.v2.SetCredentials(creds["user"], creds["password"])
@@ -245,7 +245,7 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
     Return a list of the VMs that are on the provider
     usage: "salt-cloud -f get_group_estimate clc group=Dev location=VA1"
     '''
-    for key,value in kwargs.iteritems():
+    for key, value in kwargs.iteritems():
         group = value["group"]
         location = value["location"]
     creds = get_creds()
@@ -261,7 +261,7 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
         estimate = round(billing["MonthlyEstimate"], 2)
         month_to_date = round(billing["MonthToDate"], 2)
         return {"Monthly Estimate":estimate, "Month to Date":month_to_date}
-    except (RuntimeError):
+    except RuntimeError:
         return 0
 
 
@@ -269,8 +269,8 @@ def avail_images(call=None):
     all_servers = list_nodes_full()
     templates = {}
     for server in all_servers:
-      if server["IsTemplate"]:
-          templates.update({"Template Name": server["Name"]})
+        if server["IsTemplate"]:
+            templates.update({"Template Name": server["Name"]})
     return templates
 
 
@@ -298,19 +298,18 @@ def __virtual__():
     return __virtualname__
 
 
-def get_build_status(req_id,nodename):
+def get_build_status(req_id, nodename):
     counter = 0
     req_id = str(req_id)
-    while (counter < 10):
+    while counter < 10:
         queue = clc.v1.Blueprint.GetStatus(request_id=(req_id))
-        if (queue["PercentComplete"] == 100):
-            
+        if queue["PercentComplete"] == 100:
             server_name = queue["Servers"][0]
             creds = get_creds()
             clc.v2.SetCredentials(creds["user"], creds["password"]) 
             ip_addresses = clc.v2.Server(server_name).ip_addresses
             internal_ip_address = ip_addresses[0]["internal"] 
-            return internal_ip_address            
+            return internal_ip_address          
         else:
             counter = counter + 1
             log.info("Creating Cloud VM " + nodename + " Time out in " + str(10 - counter) + " minutes")
@@ -378,4 +377,3 @@ def create(vm_):
 
 def destroy(name, call=None):
     return {"status":"destroying must be done via https://control.ctl.io at this time"}
-
