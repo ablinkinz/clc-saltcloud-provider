@@ -255,7 +255,7 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
             'The list_nodes_full function must be called with -f or --function.'
         )
     try:
-        billing_raw = clc.v1.Billing.GetGroupEstimate(group=group, alias=accountalias, location=location)
+        billing_raw = clc.v1.Billing.GetGroupEstimate(group=group, alias=creds["accountalias"], location=location)
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
         estimate = round(billing["MonthlyEstimate"], 2)
@@ -285,19 +285,6 @@ def avail_sizes(call=None):
     return {"Sizes":"Sizes are built into templates. Choose appropriate template"}
 
 
-def __virtual__():
-    '''
-    Check for DigitalOcean configurations
-    '''
-    if get_configured_provider() is False:
-        return False
-
-    if get_dependencies() is False:
-        return False
-
-    return __virtualname__
-
-
 def get_build_status(req_id, nodename):
     counter = 0
     req_id = str(req_id)
@@ -308,8 +295,8 @@ def get_build_status(req_id, nodename):
             creds = get_creds()
             clc.v2.SetCredentials(creds["user"], creds["password"]) 
             ip_addresses = clc.v2.Server(server_name).ip_addresses
-            internal_ip_address = ip_addresses[0]["internal"] 
-            return internal_ip_address          
+            internal_ip_address = ip_addresses[0]["internal"]
+            return internal_ip_address
         else:
             counter = counter + 1
             log.info("Creating Cloud VM " + nodename + " Time out in " + str(10 - counter) + " minutes")
