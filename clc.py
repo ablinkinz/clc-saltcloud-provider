@@ -235,6 +235,7 @@ def get_server_alerts(call=None, for_output=True, **kwargs):
     Return a list of alerts from CLC as reported by their infra
     '''
     for key, value in kwargs.iteritems():
+        servername = ""
         if key == "servername":
             servername = value
     creds = get_creds()
@@ -249,10 +250,12 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
     usage: "salt-cloud -f get_group_estimate clc group=Dev location=VA1"
     '''
     for key, value in kwargs.iteritems():
+        group = ""
+        location =""
         if key == "group":
             group = value
         if key == "location":
-            location = "location"
+            location = value
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"], creds["token_pass"])
     if call == 'action':
