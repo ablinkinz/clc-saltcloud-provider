@@ -5,7 +5,7 @@ salt-cloud provider for Century Link Cloud
 CenturyLink Cloud Module
 ===================
 
-.. versionadded:: 2017.7.14
+.. versionadded:: (DEVELOP BRANCH 2017.7+)
 
 The CLC cloud module allows you to manage CLC Via the CLC SDK.
 
