@@ -235,7 +235,11 @@ def get_server_alerts(call=None, for_output=True, **kwargs):
     Return a list of alerts from CLC as reported by their infra
     '''
     for key, value in kwargs.iteritems():
+<<<<<<< HEAD
+        if key == "servername":
+=======
         if key = "servername"
+>>>>>>> b97001c50f57d50766cb20817d85caf181473a41
             servername = value
     creds = get_creds()
     clc.v2.SetCredentials(creds["user"], creds["password"])
