@@ -63,24 +63,15 @@ cloud configuration at
 
 # Import python libs
 from __future__ import absolute_import
-#from random import randint
-#from re import findall
-#import pprint
 import logging
 import time
-#import os.path
-#import subprocess
 import json
 # Import salt libs
-#import salt.utils
-#import salt.utils.cloud
-#import salt.utils.xmlutil
 import importlib
 from salt.exceptions import SaltCloudSystemExit
-#from flask import Flask, request
 # Import salt cloud libs
 import salt.config as config
-import requests
+
 
 # Get logging started
 log = logging.getLogger(__name__)
