@@ -63,24 +63,24 @@ cloud configuration at
 
 # Import python libs
 from __future__ import absolute_import
-from random import randint
-from re import findall
-import pprint
+#from random import randint
+#from re import findall
+#import pprint
 import logging
 import time
-import os.path
-import subprocess
+#import os.path
+#import subprocess
 import json
 # Import salt libs
-import salt.utils
-import salt.utils.cloud
-import salt.utils.xmlutil
+#import salt.utils
+#import salt.utils.cloud
+#import salt.utils.xmlutil
 import importlib
 from salt.exceptions import SaltCloudSystemExit
-from flask import Flask, request
+#from flask import Flask, request
 # Import salt cloud libs
 import salt.config as config
-import requests
+#import requests
 
 
 # Attempt to import clc-sdk lib
@@ -102,11 +102,11 @@ try:
     import salt.ext.six as six
     HAS_SIX = True
 except ImportError:
-    # Salt version <= 2014.7.0
-    try:
-        import six
-    except ImportError:
-        HAS_SIX = False
+    return {"error":"Salt master version 2017.+ required"}
+#    try:
+#        import six
+#    except ImportError:
+#        HAS_SIX = False
 
 
 # Get logging started
@@ -293,7 +293,7 @@ def get_build_status(req_id, nodename):
         if queue["PercentComplete"] == 100:
             server_name = queue["Servers"][0]
             creds = get_creds()
-            clc.v2.SetCredentials(creds["user"], creds["password"]) 
+            clc.v2.SetCredentials(creds["user"], creds["password"])
             ip_addresses = clc.v2.Server(server_name).ip_addresses
             internal_ip_address = ip_addresses[0]["internal"]
             return internal_ip_address
