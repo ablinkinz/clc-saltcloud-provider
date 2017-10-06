@@ -257,13 +257,14 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
         if key == "location":
             location = value
     creds = get_creds()
+    accountalias = creds["accountalias"]
     clc.v1.SetCredentials(creds["token"], creds["token_pass"])
     if call == 'action':
         raise SaltCloudSystemExit(
             'The list_nodes_full function must be called with -f or --function.'
         )
     try:
-        billing_raw = clc.v1.Billing.GetGroupEstimate(group=group, alias=creds["accountalias"], location=location)
+        billing_raw = clc.v1.Billing.GetGroupEstimate(group=group, alias=accountalias, location=location)
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
         estimate = round(billing["MonthlyEstimate"], 2)
