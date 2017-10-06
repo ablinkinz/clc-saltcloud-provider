@@ -80,8 +80,10 @@ from salt.exceptions import SaltCloudSystemExit
 #from flask import Flask, request
 # Import salt cloud libs
 import salt.config as config
-#import requests
+import requests
 
+# Get logging started
+log = logging.getLogger(__name__)
 
 # Attempt to import clc-sdk lib
 try:
@@ -102,15 +104,12 @@ try:
     import salt.ext.six as six
     HAS_SIX = True
 except ImportError:
-    return {"error":"Salt master version 2017.+ required"}
+    log.debug("Salt master version 2017.+ required")
 #    try:
 #        import six
 #    except ImportError:
 #        HAS_SIX = False
 
-
-# Get logging started
-log = logging.getLogger(__name__)
 
 __virtualname__ = 'clc'
 
