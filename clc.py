@@ -231,8 +231,12 @@ def get_month_to_date(call=None, for_output=True):
 
 
 def get_server_alerts(call=None, for_output=True, **kwargs):
+    '''
+    Return a list of alerts from CLC as reported by their infra
+    '''
     for key, value in kwargs.iteritems():
-        servername = value["servername"]
+        if key = "servername"
+            servername = value
     creds = get_creds()
     clc.v2.SetCredentials(creds["user"], creds["password"])
     alerts = clc.v2.Server(servername).Alerts()
@@ -245,8 +249,10 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
     usage: "salt-cloud -f get_group_estimate clc group=Dev location=VA1"
     '''
     for key, value in kwargs.iteritems():
-        group = value["group"]
-        location = value["location"]
+        if key == "group":
+            group = value
+        if key == "location":
+            location = "location"
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"], creds["token_pass"])
     if call == 'action':
@@ -265,6 +271,9 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
 
 
 def avail_images(call=None):
+    '''
+    returns a list of images available to you
+    '''
     all_servers = list_nodes_full()
     templates = {}
     for server in all_servers:
@@ -274,6 +283,9 @@ def avail_images(call=None):
 
 
 def avail_locations(call=None):
+    '''
+    returns a list of locations available to you
+    '''
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"], creds["token_pass"])
     locations = clc.v1.Account.GetLocations()
@@ -281,10 +293,16 @@ def avail_locations(call=None):
 
 
 def avail_sizes(call=None):
+    '''
+    use templates for this
+    '''
     return {"Sizes":"Sizes are built into templates. Choose appropriate template"}
 
 
 def get_build_status(req_id, nodename):
+    '''
+    get the build status from CLC to make sure we dont return to early
+    '''
     counter = 0
     req_id = str(req_id)
     while counter < 10:
@@ -303,6 +321,9 @@ def get_build_status(req_id, nodename):
 
 
 def create(vm_):
+    '''
+    get the system build going
+    '''
     creds = get_creds()
     clc.v1.SetCredentials(creds["token"], creds["token_pass"])
     cloud_profile = config.is_provider_configured(
@@ -362,4 +383,7 @@ def create(vm_):
 
 
 def destroy(name, call=None):
+    '''
+    destroy the vm
+    '''
     return {"status":"destroying must be done via https://control.ctl.io at this time"}
