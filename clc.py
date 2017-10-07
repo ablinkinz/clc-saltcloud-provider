@@ -72,7 +72,6 @@ from salt.exceptions import SaltCloudSystemExit
 # Import salt cloud libs
 import salt.config as config
 
-
 # Get logging started
 log = logging.getLogger(__name__)
 
@@ -90,16 +89,6 @@ try:
     disable_warnings()
 except Exception:
     pass
-
-try:
-    import salt.ext.six as six
-    HAS_SIX = True
-except ImportError:
-    log.debug("Salt master version 2017.+ required")
-#    try:
-#        import six
-#    except ImportError:
-#        HAS_SIX = False
 
 
 __virtualname__ = 'clc'
@@ -130,7 +119,6 @@ def get_dependencies():
     '''
     deps = {
         'clc': HAS_CLC,
-        'six': HAS_SIX
     }
     return config.check_driver_dependencies(
         __virtualname__,
@@ -154,7 +142,7 @@ def get_creds():
     token_pass = config.get_cloud_config_value(
     'token_pass', get_configured_provider(), __opts__, search_global=False
     )
-    creds = {'user':user, 'password':password, 'token':token, 'token_pass':token_pass, 'accountalias':accountalias}
+    creds = {'user': user, 'password': password, 'token': token, 'token_pass': token_pass, 'accountalias': accountalias}
     return creds
 
 
@@ -196,9 +184,9 @@ def get_monthly_estimate(call=None, for_output=True):
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
         billing = round(billing["MonthlyEstimate"], 2)
-        return {"Monthly Estimate":billing}
+        return {"Monthly Estimate": billing}
     except RuntimeError:
-        return {"Monthly Estimate":0}
+        return {"Monthly Estimate": 0}
 
 
 def get_month_to_date(call=None, for_output=True):
@@ -216,7 +204,7 @@ def get_month_to_date(call=None, for_output=True):
         billing_raw = json.dumps(billing_raw)
         billing = json.loads(billing_raw)
         billing = round(billing["MonthToDateTotal"], 2)
-        return {"Month To Date":billing}
+        return {"Month To Date": billing}
     except RuntimeError:
         return 0
 
@@ -225,7 +213,7 @@ def get_server_alerts(call=None, for_output=True, **kwargs):
     '''
     Return a list of alerts from CLC as reported by their infra
     '''
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
         servername = ""
         if key == "servername":
             servername = value
@@ -240,9 +228,9 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
     Return a list of the VMs that are on the provider
     usage: "salt-cloud -f get_group_estimate clc group=Dev location=VA1"
     '''
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
         group = ""
-        location =""
+        location = ""
         if key == "group":
             group = value
         if key == "location":
@@ -259,7 +247,7 @@ def get_group_estimate(call=None, for_output=True, **kwargs):
         billing = json.loads(billing_raw)
         estimate = round(billing["MonthlyEstimate"], 2)
         month_to_date = round(billing["MonthToDate"], 2)
-        return {"Monthly Estimate":estimate, "Month to Date":month_to_date}
+        return {"Monthly Estimate": estimate, "Month to Date": month_to_date}
     except RuntimeError:
         return 0
 
@@ -290,7 +278,7 @@ def avail_sizes(call=None):
     '''
     use templates for this
     '''
-    return {"Sizes":"Sizes are built into templates. Choose appropriate template"}
+    return {"Sizes": "Sizes are built into templates. Choose appropriate template"}
 
 
 def get_build_status(req_id, nodename):
@@ -371,7 +359,7 @@ def create(vm_):
 
     # Bootstrap!
     ret = __utils__['cloud.bootstrap'](vm_, __opts__)
-    return_message = {"Server Name":name, "IP Address":vm_['ssh_host']}
+    return_message = {"Server Name": name, "IP Address": vm_['ssh_host']}
     ret.update(return_message)
     return return_message
 
@@ -380,4 +368,4 @@ def destroy(name, call=None):
     '''
     destroy the vm
     '''
-    return {"status":"destroying must be done via https://control.ctl.io at this time"}
+    return {"status": "destroying must be done via https://control.ctl.io at this time"}
