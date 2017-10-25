@@ -361,6 +361,14 @@ def create(vm_):
     ret = __utils__['cloud.bootstrap'](vm_, __opts__)
     return_message = {"Server Name": name, "IP Address": vm_['ssh_host']}
     ret.update(return_message)
+    __utils__['cloud.fire_event'](
+        'event',
+        'created instance',
+        'salt/cloud/{0}/created'.format(vm_['name']),
+        args=__utils__['cloud.filter_event']('created', vm_, ['name', 'profile', 'provider', 'driver']),
+        sock_dir=__opts__['sock_dir'],
+        transport=__opts__['transport']
+    )
     return return_message
 
 
