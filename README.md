@@ -9,7 +9,7 @@ CenturyLink Cloud Module
 
 The CLC cloud module allows you to manage CLC Via the CLC SDK.
 
-:codeauthor: Stephan Looney <slooney@stephanlooney.com>
+:codeauthor: Stephan Looney <slooney@stephanlooney.com> 
 
 
 Dependencies
