@@ -13,4 +13,4 @@ jobs:
         
         with:
           message: 'Example of message !'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PA-TOKEN }}
